@@ -12,8 +12,9 @@ public class GS {
 	public static void main(String[] args) throws IOException {
 		
 
-		File input = new File("‪sample.txt");
-		BufferedReader br = new BufferedReader(new FileReader("real1.txt"));
+		
+		File input = new File("src/lab1/real1.txt");
+		BufferedReader br = new BufferedReader(new FileReader(input));
 
 		int n = Integer.parseInt(br.readLine());
 		
