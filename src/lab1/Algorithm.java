@@ -36,58 +36,23 @@ public class Algorithm {
 		if (gatherDataTimes) {
 			gatherData();
 		} else {
-			runSetup();
+			runSetup(null);
 			gale_shapley();
 		}
 
 		// d_printInput(protons, electrons);
 	}
 
-	private static void runSetup() {
-		Scanner sc = new Scanner(System.in);
-
-		int n = Integer.parseInt(sc.nextLine());
-
-		StringBuilder sb = new StringBuilder();
-
-		for (int i = 0; i < 2 * n * (n + 1); i++) {
-			sb.append(sc.next() + " ");
-		}
-
-		String[] lineNumbers = sb.toString().split(" ");
-		int delta = 0;
-
-		for (int i = 0; i < 2 * n; i++) {
-
-			String[] person = Arrays.copyOfRange(lineNumbers, delta, delta + n + 1);
-
-			int key = Integer.parseInt(person[0]);
-
-			String[] preferences = Arrays.copyOfRange(person, 1, person.length);
-
-			if (!protons.containsKey(key)) {
-
-				int[] menPref = Arrays.stream(preferences).mapToInt(Integer::parseInt).toArray();
-				int[] inversePref = new int[n];
-
-				for (int j = 0; j < menPref.length; j++) {
-					inversePref[menPref[j] - 1] = j;
-				}
-
-				protons.put(key, inversePref);
-			} else {
-				electrons.put(key, Arrays.stream(preferences).mapToInt(Integer::parseInt).toArray());
-
-			}
-			delta = delta + n + 1;
-		}
-
-		sc.close();
-	}
 
 	private static void runSetup(File input) {
 		try {
-			 Scanner sc = new Scanner(input);
+			Scanner sc;
+			if(input == null) {
+				sc = new Scanner(System.in);
+			}
+			else {
+				sc = new Scanner(input);				
+			}
 
 			int n = Integer.parseInt(sc.nextLine());
 
