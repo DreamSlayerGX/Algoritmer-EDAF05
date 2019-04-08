@@ -79,46 +79,47 @@ public class BFS {
 	}
 	
 	private static void bfs() {
-		for(int i = queries.length - 1; i < queries.length; i++) {
+		for(int i = 0; i < queries.length; i++) {
 
 			ArrayList<String> frontier = new ArrayList<>();
 			ArrayList<String> visited = new ArrayList<>();
 
-			String answer = bfs(queries[i][0], queries[i][1], frontier, visited, 0);
-			System.out.println(answer);
+			int answer = bfs(queries[i][0], queries[i][1], frontier, visited, 0);
+			
+			if(answer < 0)
+				System.out.println("Impossible");
+			else 
+				System.out.println(answer);
 		}
 	}
 	
-	private static String bfs(String currentWord, String search, 
+	private static int bfs(String currentWord, String search, 
 			ArrayList<String> frontier, ArrayList<String> visited, int n) {
 
-		System.out.println(currentWord + " | " + search);
-		System.out.println(frontier.size() + " | " + visited.size() + " | " + n);
+//		System.out.println(currentWord + " | " + search);
+//		System.out.println(frontier.size() + " | " + visited.size() + " | " + n);
 		
 		if(currentWord.equals(search))
-			return String.valueOf(n);
+			return n;
 		
-		String bestOfAdjecent = "";
+		int bestOfAdjecent = -1;
 		
 		visited.add(currentWord);
 		for(String nextVertex : graph.get(currentWord)) {
 			
-			String result = "";
-			if(visited.contains(nextVertex))
-				continue;
-			else
+			int result = -1;
+			if(!visited.contains(nextVertex)) {
 				result = bfs(nextVertex, search, frontier, visited, n + 1);
+				
+				if(bestOfAdjecent < 0 && result >= 0 || result < bestOfAdjecent) {
+					bestOfAdjecent = result;
+				}
+			}
 			
-			if(result.length() == 1 && 
-					bestOfAdjecent.isEmpty() 
-					|| 
-					result.length() == 1 && 
-					Integer.parseInt(bestOfAdjecent) > Integer.parseInt(result))
-				bestOfAdjecent = result;
 		}
 		
 		
-		return bestOfAdjecent.equals("") ? "Impossible" : bestOfAdjecent;
+		return bestOfAdjecent < 0 ? -1 : bestOfAdjecent;
 //		if(frontier.isEmpty())
 //			return "Impossible";
 //		else
