@@ -1,4 +1,8 @@
 package lab2;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,14 +86,17 @@ public class BFS {
 	}
 
 	private static void bfs() {
+		ArrayList<Long> times = new ArrayList<>(); 
 		for (int i = 0; i < queries.length; i++) {
 
 			ArrayList<Pair<String, Integer>> frontier = new ArrayList<>();
 			ArrayList<String> visited = new ArrayList<>();
 
+			long start = System.currentTimeMillis();
 			// int answer = dfs(queries[i][0], queries[i][1], visited, 0);
 			int answer = bfs(queries[i][0], queries[i][1], frontier, visited, 0);
-
+			times.add(System.currentTimeMillis() - start);
+			
 //			if (answer < 0)
 //				System.out.println("Impossible");
 //			else
@@ -99,6 +106,7 @@ public class BFS {
 				System.out.println((float)i/Q*100 + " %");
 		}
 		System.out.println("Done!");
+		statistic(times);
 	}
 
 	private static int bfs(String currentWord, String search, ArrayList<Pair<String, Integer>> frontier,
@@ -107,8 +115,10 @@ public class BFS {
 //		System.out.println(currentWord + " | " + search);
 //		System.out.println(frontier.size() + " | " + visited.size() + " | " + n);
 
-		if (currentWord.equals(search))
+		if (currentWord.equals(search)) {
+			frontier = new ArrayList<>();
 			return n;
+		}
 
 		visited.add(currentWord);
 		for (String nextVertex : graph.get(currentWord)) {
@@ -199,7 +209,31 @@ public class BFS {
 		}
 		return "Impossible";
 	}
-
+	
+	private static void statistic(ArrayList<Long> times) {
+		Long average = 0L;
+		
+		for(Long t : times)
+			average += t;
+		
+		average /= times.size();
+		
+		File f = new File("BFS-statistic.txt");
+		try {
+			BufferedWriter br = new BufferedWriter(new FileWriter(f, true));
+			String data = Integer.toString(N) + " " + Integer.toString(Q) + " " + Long.toString(average);
+			br.write(data);
+			br.newLine();
+			
+			br.flush();
+			br.close();
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+		
+	}
+	
 	private static void d_printInputData() {
 		System.out.println(N);
 		System.out.println(Q);
