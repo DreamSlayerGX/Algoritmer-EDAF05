@@ -79,7 +79,7 @@ public class BFS {
 	}
 	
 	private static void bfs() {
-		for(int i = 0; i < 1; i++) {
+		for(int i = queries.length - 1; i < queries.length; i++) {
 
 			ArrayList<String> frontier = new ArrayList<>();
 			ArrayList<String> visited = new ArrayList<>();
@@ -98,19 +98,31 @@ public class BFS {
 		if(currentWord.equals(search))
 			return String.valueOf(n);
 		
+		String bestOfAdjecent = "";
+		
 		visited.add(currentWord);
 		for(String nextVertex : graph.get(currentWord)) {
+			
+			String result = "";
 			if(visited.contains(nextVertex))
 				continue;
 			else
-				frontier.add(nextVertex);
+				result = bfs(nextVertex, search, frontier, visited, n + 1);
 			
+			if(result.length() == 1 && 
+					bestOfAdjecent.isEmpty() 
+					|| 
+					result.length() == 1 && 
+					Integer.parseInt(bestOfAdjecent) > Integer.parseInt(result))
+				bestOfAdjecent = result;
 		}
 		
-		if(frontier.isEmpty())
-			return "Impossible";
-		else
-			return bfs(frontier.remove(0), search, frontier, visited, n++);
+		
+		return bestOfAdjecent.equals("") ? "Impossible" : bestOfAdjecent;
+//		if(frontier.isEmpty())
+//			return "Impossible";
+//		else
+//			return bfs(frontier.remove(0), search, frontier, visited, n++);
 	}
 	
 	private static void d_printInputData(){
