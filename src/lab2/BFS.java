@@ -2,6 +2,7 @@ package lab2;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 
 public class BFS {
@@ -14,8 +15,9 @@ public class BFS {
 	public static void main(String[] args) {
 		parseInputData();
 		createGraph();
-		d_printInputData();
-		//BFS();
+		//d_printInputData();
+		d_printGraph();
+		bfs();
 	}
 	
 	private static void parseInputData() {
@@ -76,39 +78,39 @@ public class BFS {
 
 	}
 	
-	private static void BFS() {
-		for(int i = 0; i < queries.length; i++) {
-			String answer = BFS(queries[i][0], queries[i][1]);
+	private static void bfs() {
+		for(int i = 0; i < 1; i++) {
+
+			ArrayList<String> frontier = new ArrayList<>();
+			ArrayList<String> visited = new ArrayList<>();
+
+			String answer = bfs(queries[i][0], queries[i][1], frontier, visited, 0);
 			System.out.println(answer);
 		}
 	}
 	
-	private static String BFS(String currentWord, String search) {
-		int n = 0;
-		
-		ArrayList<String> frontier = new ArrayList<>();
-		ArrayList<String> visited = new ArrayList<>();
+	private static String bfs(String currentWord, String search, 
+			ArrayList<String> frontier, ArrayList<String> visited, int n) {
+
+		System.out.println(currentWord + " | " + search);
+		System.out.println(frontier.size() + " | " + visited.size() + " | " + n);
 		
 		if(currentWord.equals(search))
 			return String.valueOf(n);
 		
-		frontier.add(currentWord);
+		visited.add(currentWord);
 		for(String nextVertex : graph.get(currentWord)) {
 			if(visited.contains(nextVertex))
 				continue;
-			
-			
-			
+			else
+				frontier.add(nextVertex);
 			
 		}
 		
-		
-		
-		
-		
-		
-		
-		return "";
+		if(frontier.isEmpty())
+			return "Impossible";
+		else
+			return bfs(frontier.remove(0), search, frontier, visited, n++);
 	}
 	
 	private static void d_printInputData(){
@@ -121,6 +123,15 @@ public class BFS {
 		for(int i = 0; i < queries.length; i++)
 			System.out.println(queries[i][0] + " " + queries[i][1]);
 		
+	}
+	
+	private static void d_printGraph() {
+		for(Entry<String, ArrayList<String>> set : graph.entrySet()) {
+			System.out.println(set.getKey());
+			for(String vertex : set.getValue()) {
+				System.out.println("  " + vertex);
+			}
+		}
 	}
 	
 }
