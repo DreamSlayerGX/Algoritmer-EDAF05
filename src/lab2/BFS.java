@@ -23,7 +23,9 @@ public class BFS {
 		createGraph();
 		// d_printInputData();
 		// d_printGraph();
-		bfs();
+		//bdfs(true, false);
+		iterativeBFS(true);
+		
 	}
 
 	private static void parseInputData() {
@@ -85,28 +87,30 @@ public class BFS {
 
 	}
 
-	private static void bfs() {
+	private static void bdfs(boolean bfs, boolean takeData) {
 		ArrayList<Long> times = new ArrayList<>(); 
 		for (int i = 0; i < queries.length; i++) {
 
 			ArrayList<Pair<String, Integer>> frontier = new ArrayList<>();
 			ArrayList<String> visited = new ArrayList<>();
-
+			
+			int answer;
 			long start = System.currentTimeMillis();
-			// int answer = dfs(queries[i][0], queries[i][1], visited, 0);
-			int answer = bfs(queries[i][0], queries[i][1], frontier, visited, 0);
+			if(bfs)
+				answer = bfs(queries[i][0], queries[i][1], frontier, visited, 0);
+			else
+				answer = dfs(queries[i][0], queries[i][1], visited, 0);
 			times.add(System.currentTimeMillis() - start);
 			
-//			if (answer < 0)
-//				System.out.println("Impossible");
-//			else
-//				System.out.println(answer);
+			if (answer < 0)
+				System.out.println("Impossible");
+			else
+				System.out.println(answer);
 			
-			if(i % 20 == 0)
-				System.out.println((float)i/Q*100 + " %");
 		}
-		System.out.println("Done!");
-		statistic(times);
+		
+		if(takeData)
+			statistic(times);
 	}
 
 	private static int bfs(String currentWord, String search, ArrayList<Pair<String, Integer>> frontier,
@@ -163,11 +167,16 @@ public class BFS {
 		return bestOfAdjecent;
 	}
 
-	private static void iterativeBFS() {
+	private static void iterativeBFS(boolean takeData) {
+		ArrayList<Long> times = new ArrayList<>();
 		for (int i = 0; i < queries.length; i++) {
+			long start = System.currentTimeMillis();
 			String answer = iterativeBFS(graph, queries[i][0], queries[i][1]);
+			times.add(System.currentTimeMillis() - start);
 			System.out.println(answer);
 		}
+		if(takeData)
+			statistic(times);
 	}
 
 	private static String iterativeBFS(Map<String, ArrayList<String>> graph, String start, String target) {
