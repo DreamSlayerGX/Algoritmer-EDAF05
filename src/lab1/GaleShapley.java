@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Algorithm {
+public class GaleShapley {
 
 	private static final File test = new File("src/lab1/1.in");
 
