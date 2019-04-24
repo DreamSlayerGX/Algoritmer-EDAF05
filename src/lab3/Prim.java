@@ -25,10 +25,8 @@ public class Prim {
 
 	private static int N, M;
 	private static Map<Integer, ArrayList<Edge>> forest;
-	
-	private static final boolean recursive = true;
-	
-	public static int i = 0;
+
+	private static final boolean recursive = false;
 
 	public static void main(String[] args) {
 		parseInputData();
@@ -60,7 +58,6 @@ public class Prim {
 				if (!forest.containsKey(u))
 					forest.put(u, new ArrayList<>());
 
-				
 				Edge e = new Edge(v, u, w);
 				forest.get(v).add(e);
 				forest.get(u).add(e);
@@ -83,74 +80,87 @@ public class Prim {
 	}
 
 	private static void prims() {
+
 		boolean[] vertexConnected = new boolean[forest.size()];
-		
+		PriorityQueue<Edge> edgeSet = new PriorityQueue<>((e1, e2) -> (e1.w <= e2.w) ? -1 : 1);
+
+		edgeSet.addAll(forest.get(1));
+		vertexConnected[forest.get(1).get(0).v - 1] = true;
 		int totalWeight = 0;
-		
-		if(recursive) {
-			PriorityQueue<Edge> edgeSet = new PriorityQueue<>((e1, e2) -> (e1.w <= e2.w) ? -1 : 1);
-			
-			edgeSet.addAll(forest.get(1));
-			vertexConnected[forest.get(1).get(0).v - 1] = true;
-			
+
+		if (recursive) {
 			totalWeight = primsRec(edgeSet, vertexConnected, 0);
-			
-			//primsRec(forest.get(1), vertexConnected, 0);
-			
 		} else {
-			totalWeight = primsIter();
+			totalWeight = primsIter(edgeSet, vertexConnected);
 		}
-		
-		
+
 		System.out.println(totalWeight);
-		
 
 	}
-	
+
 	private static int primsRec(PriorityQueue<Edge> edgeSet, boolean[] vertexConnected, int totalWeight) {
-		
+
 		Edge e = edgeSet.poll();
-//		i++;
-//		
-//		if(i >= 10)
-//			return totalWeight;
-		
-		if(e == null)
+
+		if (e == null)
 			return totalWeight;
-		
-		System.out.println(e.v + " " + e.u + " " + e.w);
-		System.out.println("Size of set: " + edgeSet.size());
-		System.out.println("Visited index " + (e.v) + " and " + e.u + ": " + vertexConnected[e.u - 1] +"\n");
-		
-		if(vertexConnected[e.v - 1] && vertexConnected[e.u - 1]) {
+
+//		System.out.println(e.v + " " + e.u + " " + e.w);
+//		System.out.println("Size of set: " + edgeSet.size());
+//		System.out.println("Visited index " + (e.v) + " and " + e.u + ": " + vertexConnected[e.u - 1] +"\n");
+
+		if (vertexConnected[e.v - 1] && vertexConnected[e.u - 1]) {
 			return primsRec(edgeSet, vertexConnected, totalWeight);
 		}
-			
 
 		int nextVertex = 0;
-		if(vertexConnected[e.v - 1]) {
+		if (vertexConnected[e.v - 1]) {
 			vertexConnected[e.u - 1] = true;
 			nextVertex = e.u;
-		}
-		else {
+		} else {
 			vertexConnected[e.v - 1] = true;
 			nextVertex = e.v;
 		}
-		
-		for(Edge adjVertex : forest.get(nextVertex)) {
-			//System.out.print("Visited " + adjVertex.v + " and/or " + adjVertex.u + "?");
-			if(vertexConnected[e.v - 1] && vertexConnected[e.u - 1])
+
+		for (Edge adjVertex : forest.get(nextVertex)) {
+			// System.out.print("Visited " + adjVertex.v + " and/or " + adjVertex.u + "?");
+			if (vertexConnected[e.v - 1] && vertexConnected[e.u - 1])
 				edgeSet.add(adjVertex);
 		}
 
-		
 		return primsRec(edgeSet, vertexConnected, totalWeight + e.w);
 	}
 
-	private static int primsIter() {
-		return 0;
+	private static int primsIter(PriorityQueue<Edge> edgeSet, boolean[] vertexConnected) {
+
+		int totalWeight = 0;
+		
+		while(!edgeSet.isEmpty()) {
+			Edge e = edgeSet.poll();
+			int nextVertex = 0;
+			
+			if (vertexConnected[e.v - 1] && vertexConnected[e.u - 1]) {
+				continue;
+			} else if (vertexConnected[e.v - 1]) {
+				vertexConnected[e.u - 1] = true;
+				nextVertex = e.u;
+			} else {
+				vertexConnected[e.v - 1] = true;
+				nextVertex = e.v;
+			}
+
+			for (Edge adjVertex : forest.get(nextVertex)) {
+				if ((vertexConnected[e.v - 1] && vertexConnected[e.u - 1]))
+					edgeSet.add(adjVertex);
+			}
+			
+			totalWeight += e.w;
+			
+		}
+		
+		return totalWeight;
 	}
-	
+
 	private static void d_printInputData() {
 		System.out.println(N + " " + M);
 
@@ -162,6 +172,5 @@ public class Prim {
 		System.out.println();
 
 	}
-	
-	
+
 }
