@@ -148,9 +148,9 @@ public class Prim {
 				vertexConnected[e.v - 1] = true;
 				nextVertex = e.v;
 			}
-
+			
 			for (Edge adjVertex : forest.get(nextVertex)) {
-				if ((vertexConnected[e.v - 1] && vertexConnected[e.u - 1]))
+				if (!(vertexConnected[adjVertex.v - 1] && vertexConnected[adjVertex.u - 1]))
 					edgeSet.add(adjVertex);
 			}
 			
