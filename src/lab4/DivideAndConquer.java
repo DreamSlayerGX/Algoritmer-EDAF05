@@ -15,12 +15,12 @@ public class DivideAndConquer {
 		}
 	}
 	
-	public static class Pair{
+	public static class Data{
 		public float minDist;
-		public int[][] points;
-		public int[][] distPoints;
+		public Point[][] points;
+		public Point[] distPoints;
 		
-		Pair(float minDist, int[][] points, int[][] distPoints){
+		Data(float minDist, Point[][] points, Point[] distPoints){
 			this.minDist = minDist;
 			this.points = points;
 			this.distPoints = distPoints;
@@ -41,16 +41,16 @@ public class DivideAndConquer {
 //		System.out.println(result.minDist);
 	}
 	
-	private static Pair divideAndConquer(Point[] px2, Point[] py2, int n) {
+	private static Data divideAndConquer(Point[] px, Point[] py, int n) {
 
 		int halfSize = n/2;
-		Point[] Lx = Arrays.copyOfRange(px2, 0, halfSize);
-		Point[] Ly = Arrays.copyOfRange(py2, 0, halfSize);
-		Point[] Rx = Arrays.copyOfRange(px2, halfSize, n);
-		Point[] Ry = Arrays.copyOfRange(py2, halfSize, n);
+		Point[] Lx = Arrays.copyOfRange(px, 0, halfSize);
+		Point[] Ly = Arrays.copyOfRange(py, 0, halfSize);
+		Point[] Rx = Arrays.copyOfRange(px, halfSize, n);
+		Point[] Ry = Arrays.copyOfRange(py, halfSize, n);
 		
-		Pair leftResult = divideAndConquer(Lx, Ly, halfSize);
-		Pair rightResult = divideAndConquer(Rx, Ry, halfSize);
+		Data leftResult = divideAndConquer(Lx, Ly, halfSize);
+		Data rightResult = divideAndConquer(Rx, Ry, halfSize);
 		
 		return null;
 		
