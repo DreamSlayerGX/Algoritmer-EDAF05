@@ -1,7 +1,7 @@
 package lab4;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Scanner;
 
 public class DivideAndConquer {
@@ -15,50 +15,79 @@ public class DivideAndConquer {
 		}
 	}
 	
-	public static class Data{
-		public float minDist;
-		public Point[][] points;
-		public Point[] distPoints;
-		
-		Data(float minDist, Point[][] points, Point[] distPoints){
-			this.minDist = minDist;
-			this.points = points;
-			this.distPoints = distPoints;
-		}
-	}
-	
 	private static int N;
 	private static Point[] Px, Py;
 	private static Point[] P;
 
+	private static DecimalFormat df = new DecimalFormat("#.######");
 	
 	
 	public static void main(String[] args) {
 		parseInputData();
 		d_printInputData();
-//		Pair result = divideAndConquer(Px, Py, N);
-//		
-//		System.out.println(result.minDist);
+		double result = divideAndConquer(Px, N);
+		
+		
+		System.out.printf("\n%.6f", result);
 	}
 	
-	private static Data divideAndConquer(Point[] px, Point[] py, int n) {
-
+	private static double divideAndConquer(Point[] px, int n) {
+		if(px.length == 1) {
+			return Double.MAX_VALUE;
+		} else if(px.length == 2) {
+			return getDistance(px[0], px[1]);
+		}
+		
+		
 		int halfSize = n/2;
 		Point[] Lx = Arrays.copyOfRange(px, 0, halfSize);
-		Point[] Ly = Arrays.copyOfRange(py, 0, halfSize);
+		//Point[] Ly = Arrays.copyOfRange(py, 0, halfSize);
+		
 		Point[] Rx = Arrays.copyOfRange(px, halfSize, n);
-		Point[] Ry = Arrays.copyOfRange(py, halfSize, n);
+		//Point[] Ry = Arrays.copyOfRange(py, halfSize, n);
 		
-		Data leftResult = divideAndConquer(Lx, Ly, halfSize);
-		Data rightResult = divideAndConquer(Rx, Ry, halfSize);
+		double leftResult = divideAndConquer(Lx, halfSize);
+		double rightResult = divideAndConquer(Rx, halfSize);
 		
-		return null;
+		double delta = Math.min(leftResult, rightResult);
+		double min = delta;
+		
+		Point midPoint = Rx[0];
+		Point[] insideDelta = new Point[n];
+		
+		int j = 0;
+		for(int i = 0; i < halfSize; i++) {
+			if(Math.pow(Rx[i].x - midPoint.x, 2) > delta)
+				break;
+			
+			insideDelta[j++] = Rx[i];
+		}
+		
+		for(int i = halfSize-1; i >= 0; i--) {
+			if(Math.pow(Lx[i].x - midPoint.x, 2) > delta)
+				break;
+			
+			insideDelta[j++] = Lx[i];
+		}
+		
+		d_printSubArray(insideDelta, min);
+		
+		for(int i = 0; i < insideDelta.length && insideDelta[i] != null; i++)
+			for(int k = i + 1; k < insideDelta.length && insideDelta[k] != null; k++) {
+				double distance = getDistance(insideDelta[i], insideDelta[k]);
+				
+				if(distance < min)
+					min = distance;
+			}
+					
+					
+		return min;
 		
 	}
 	
 	
-	private static float getDistance(int[] a, int[] b) {
-		return (float) Math.sqrt(Math.abs(a[0] - b[0]) * Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]) * Math.abs(a[1] - b[1]));
+	private static double getDistance(Point a, Point b) {
+		return (double) Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
 	}
 	
 	private static void parseInputData() {
@@ -83,16 +112,26 @@ public class DivideAndConquer {
 			Arrays.sort(Px, (p1, p2) -> p1.x - p2.x);
 			Arrays.sort(Py, (p1, p2) -> p1.y - p2.y);
 			
+			sc.close();
 		} catch (Exception e) {
 			
 		}
 		
 	}
 	
+	private static void d_printSubArray(Point[] p, double min) {
+		System.out.println(p.length + " | Current min: " + Double.valueOf(df.format(min)));
+		for(Point pp : p)
+			if(pp != null)
+				System.out.println(pp.x + " " + pp.y);
+		System.out.println();
+	}
+	
 	private static void d_printInputData() {
 		System.out.println(N);
 		for(int i = 0; i < N; i++)
 			System.out.println("Sorted X: " + Px[i].x + " " + Px[i].y + " | Sorted Y:  " + Py[i].x + " " + Py[i].y);
+		System.out.println();
 	}
 
 }
