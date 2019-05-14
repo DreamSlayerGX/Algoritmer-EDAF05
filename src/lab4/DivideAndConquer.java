@@ -24,7 +24,7 @@ public class DivideAndConquer {
 	
 	public static void main(String[] args) {
 		parseInputData();
-		d_printInputData();
+		//d_printInputData();
 		double result = divideAndConquer(Px, N);
 		
 		
@@ -41,10 +41,7 @@ public class DivideAndConquer {
 		
 		int halfSize = n/2;
 		Point[] Lx = Arrays.copyOfRange(px, 0, halfSize);
-		//Point[] Ly = Arrays.copyOfRange(py, 0, halfSize);
-		
 		Point[] Rx = Arrays.copyOfRange(px, halfSize, n);
-		//Point[] Ry = Arrays.copyOfRange(py, halfSize, n);
 		
 		double leftResult = divideAndConquer(Lx, halfSize);
 		double rightResult = divideAndConquer(Rx, halfSize);
@@ -57,23 +54,21 @@ public class DivideAndConquer {
 		
 		int j = 0;
 		for(int i = 0; i < halfSize; i++) {
-			if(Math.pow(Rx[i].x - midPoint.x, 2) > delta)
+			if(Math.pow(Rx[i].x - midPoint.x, 2) < delta)
+				insideDelta[j++] = Rx[i];
+			else if(Math.pow(Lx[(halfSize - 1) - i].x - midPoint.x, 2) < delta)
+				insideDelta[j++] = Lx[i];
+			else
 				break;
-			
-			insideDelta[j++] = Rx[i];
 		}
 		
-		for(int i = halfSize-1; i >= 0; i--) {
-			if(Math.pow(Lx[i].x - midPoint.x, 2) > delta)
-				break;
-			
-			insideDelta[j++] = Lx[i];
-		}
+		//d_printSubArray(insideDelta, min);
 		
-		d_printSubArray(insideDelta, min);
-		
+		// v	v						v   	v					v			v 
+		//[p1, p2, p3, null, null] -> [p1, p2, p3, null, null] -> [p1, p2, p3, null, null] -> break
 		for(int i = 0; i < insideDelta.length && insideDelta[i] != null; i++)
 			for(int k = i + 1; k < insideDelta.length && insideDelta[k] != null; k++) {
+				
 				double distance = getDistance(insideDelta[i], insideDelta[k]);
 				
 				if(distance < min)
@@ -97,15 +92,11 @@ public class DivideAndConquer {
 			N = Integer.parseInt(sc.nextLine());
 			
 			Px = new Point[N];
-			Py = new Point[N];
-			P = new Point[N];
 			
 			for(int i = 0; i < N; i++) {
 				int[] points = Arrays.stream(sc.nextLine().split(" ")).mapToInt(Integer::parseInt).toArray();
 				Point p = new Point(points[0], points[1]);
 				P[i] = p;
-				Px[i] = p;
-				Py[i] = p;
 			}
 			
 			
