@@ -23,7 +23,7 @@ public class DivideAndConquer {
 	
 	public static void main(String[] args) {
 		parseInputData();
-		d_printInputData();
+		//d_printInputData();
 		double result = divideAndConquer(Px, N);
 		
 		
@@ -53,14 +53,18 @@ public class DivideAndConquer {
 		
 		int j = 0;
 		for(int i = 0; i < halfSize; i++) {
-			if(Math.pow(Rx[i].x - midPoint.x, 2) < delta)
-				insideDelta[j++] = Rx[i];
-			else if(Math.pow(Lx[(halfSize - 1) - i].x - midPoint.x, 2) < delta)
-				insideDelta[j++] = Lx[i];
-			else
+			if(Math.pow(Rx[i].x - midPoint.x, 2) > delta)
 				break;
+			
+			insideDelta[j++] = Rx[i];
 		}
 		
+		for(int i = halfSize -1; i >= 0; i--) {
+			if(Math.pow(Lx[i].x - midPoint.x, 2) > delta)
+				break;
+		
+			insideDelta[j++] = Lx[i];
+		}
 		//d_printSubArray(insideDelta, min);
 		
 		// v	v						v   	v					v			v 
