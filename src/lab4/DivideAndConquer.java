@@ -16,15 +16,14 @@ public class DivideAndConquer {
 	}
 	
 	private static int N;
-	private static Point[] Px, Py;
-	private static Point[] P;
+	private static Point[] Px;
 
 	private static DecimalFormat df = new DecimalFormat("#.######");
 	
 	
 	public static void main(String[] args) {
 		parseInputData();
-		//d_printInputData();
+		d_printInputData();
 		double result = divideAndConquer(Px, N);
 		
 		
@@ -96,12 +95,10 @@ public class DivideAndConquer {
 			for(int i = 0; i < N; i++) {
 				int[] points = Arrays.stream(sc.nextLine().split(" ")).mapToInt(Integer::parseInt).toArray();
 				Point p = new Point(points[0], points[1]);
-				P[i] = p;
+				Px[i] = p;
 			}
 			
-			
 			Arrays.sort(Px, (p1, p2) -> p1.x - p2.x);
-			Arrays.sort(Py, (p1, p2) -> p1.y - p2.y);
 			
 			sc.close();
 		} catch (Exception e) {
@@ -121,7 +118,7 @@ public class DivideAndConquer {
 	private static void d_printInputData() {
 		System.out.println(N);
 		for(int i = 0; i < N; i++)
-			System.out.println("Sorted X: " + Px[i].x + " " + Px[i].y + " | Sorted Y:  " + Py[i].x + " " + Py[i].y);
+			System.out.println("Sorted X: " + Px[i].x + " " + Px[i].y);
 		System.out.println();
 	}
 
