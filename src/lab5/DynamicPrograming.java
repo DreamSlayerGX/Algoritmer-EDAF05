@@ -3,6 +3,7 @@ package lab5;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 
 import javafx.util.Pair;
@@ -24,7 +25,7 @@ public class DynamicPrograming {
 	}
 	
 	private static int dynoPro(int i, int k) {
-		 
+		 return 0;
 	}
 	
 	private static void parseInputData() {
@@ -63,8 +64,8 @@ public class DynamicPrograming {
 	}
 	
 	private static void d_printInput() {
-		for(String s : characters)
-			System.out.print(s + " ");
+		for(Entry s : characters.entrySet())
+			System.out.print(s.getKey() + " ");
 		
 		for(int i = 0; i < N; i++) {
 			System.out.println();
