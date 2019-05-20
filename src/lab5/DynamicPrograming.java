@@ -1,6 +1,8 @@
 package lab5;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import javafx.util.Pair;
@@ -8,22 +10,35 @@ import javafx.util.Pair;
 public class DynamicPrograming {
 	
 	private static int N, Q;
-	private static String[] characters;
+	private static Map<String, Integer> characters;
 	private static int[][] weightTable;
 	private static Pair<String, String>[] queries;
+	
+	private static final int insertCost = -4;
 	
 	public static void main(String[] args) {
 		parseInputData();
 		d_printInput();
+		dynoPro(N-1, N-1);
 		
+	}
+	
+	private static int dynoPro(int i, int k) {
+		 
 	}
 	
 	private static void parseInputData() {
 		try {
 			Scanner sc = new Scanner(System.in);
 			
-			characters = sc.nextLine().split(" ");
-			N = characters.length;
+			characters = new HashMap<>();
+			
+			
+			String [] chars= sc.nextLine().split(" ");
+			N = chars.length;
+			
+			for(int i = 0; i < N; i++)
+				characters.put(chars[i], i);
 			
 			weightTable = new int[N][N];
 			

@@ -67,8 +67,8 @@ public class DivideAndConquer {
 		}
 		//d_printSubArray(insideDelta, min);
 		
-		// v	v						v   	v					v			v 
-		//[p1, p2, p3, null, null] -> [p1, p2, p3, null, null] -> [p1, p2, p3, null, null] -> break
+
+		//This part can take n^2 time if all points share the same x-value. Sort by y and look ~7 points forwards instead.
 		for(int i = 0; i < insideDelta.length && insideDelta[i] != null; i++)
 			for(int k = i + 1; k < insideDelta.length && insideDelta[k] != null; k++) {
 				
