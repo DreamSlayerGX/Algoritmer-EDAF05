@@ -45,7 +45,7 @@ public class DynamicPrograming {
 			wordsByShortestPath(M, i, j - 1, subA, subB, a, b);
 
 		} else if (j == 0 && i != 0) {
-			writeNextCharacters(subA, subB, i, -1, a, b);
+			writeNextCharacters(subA, subB, i - 1, -1, a, b);
 			wordsByShortestPath(M, i - 1, j, subA, subB, a, b);
 
 		} else if (i != 0 && j != 0) {
@@ -80,6 +80,8 @@ public class DynamicPrograming {
 		String charA = "";
 		String charB = "";
 		
+		System.out.println(i + " " + j);
+		
 		if(i == -1) {
 			charA = "*";
 			charB = String.valueOf(b.charAt(j));
@@ -96,6 +98,7 @@ public class DynamicPrograming {
 		subA.insert(0, charA);
 		subB.insert(0, charB);
 	}
+	
 
 	private static int[][] generateMArray(String a, String b) {
 		int[][] M = new int[a.length() + 1][b.length() + 1];
@@ -162,6 +165,7 @@ public class DynamicPrograming {
 		}
 	}
 
+	
 	private static void d_printMArray(int[][] M, String a, String b) {
 		if (!debug)
 			return;
