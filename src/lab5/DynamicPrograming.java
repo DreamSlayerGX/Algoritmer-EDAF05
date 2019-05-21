@@ -31,22 +31,22 @@ public class DynamicPrograming {
 	private static void dynoPro(String a, String b) {
 		int[][] M = generateMArray(a, b);
 		
-		String[] result = findShortestPath(M, a.length(), b.length(),
+		String[] result = wordsByShortestPath(M, a.length(), b.length(),
 				new StringBuilder(), new StringBuilder(), a, b);
 		
 		System.out.println(result[0] + " " + result[1]);
 	}
 
-	private static String[] findShortestPath(int[][] M, int i, int j, StringBuilder subA, StringBuilder subB, String a,
+	private static String[] wordsByShortestPath(int[][] M, int i, int j, StringBuilder subA, StringBuilder subB, String a,
 			String b) {
 
 		if (i == 0 && j != 0) {
-			writeNextCharacter(subA, subB, -1, j - 1, a, b);
-			findShortestPath(M, i, j - 1, subA, subB, a, b);
+			writeNextCharacters(subA, subB, -1, j - 1, a, b);
+			wordsByShortestPath(M, i, j - 1, subA, subB, a, b);
 
 		} else if (j == 0 && i != 0) {
-			writeNextCharacter(subA, subB, i, -1, a, b);
-			findShortestPath(M, i - 1, j, subA, subB, a, b);
+			writeNextCharacters(subA, subB, i, -1, a, b);
+			wordsByShortestPath(M, i - 1, j, subA, subB, a, b);
 
 		} else if (i != 0 && j != 0) {
 			int prevDiagCost = M[i - 1][j - 1];
@@ -57,16 +57,16 @@ public class DynamicPrograming {
 					[characters.get(String.valueOf(b.charAt(j - 1)))];
 
 			if (M[i][j] == prevDiagCost + costOfDiag) {
-				writeNextCharacter(subA, subB, i - 1, j - 1, a, b);
-				findShortestPath(M, i - 1, j - 1, subA, subB, a, b);
+				writeNextCharacters(subA, subB, i - 1, j - 1, a, b);
+				wordsByShortestPath(M, i - 1, j - 1, subA, subB, a, b);
 				
 			} else if (M[i][j] == prevDownCost + delta) {
-				writeNextCharacter(subA, subB, -1, j - 1, a, b);
-				findShortestPath(M, i, j - 1, subA, subB, a, b);
+				writeNextCharacters(subA, subB, -1, j - 1, a, b);
+				wordsByShortestPath(M, i, j - 1, subA, subB, a, b);
 				
 			} else {
-				writeNextCharacter(subA, subB, i - 1, -1, a, b);
-				findShortestPath(M, i - 1, j, subA, subB, a, b);
+				writeNextCharacters(subA, subB, i - 1, -1, a, b);
+				wordsByShortestPath(M, i - 1, j, subA, subB, a, b);
 			}
 		}
 
@@ -74,7 +74,7 @@ public class DynamicPrograming {
 
 	}
 
-	private static void writeNextCharacter(StringBuilder subA, StringBuilder subB, 
+	private static void writeNextCharacters(StringBuilder subA, StringBuilder subB, 
 			int i, int j, String a, String b) {
 
 		String charA = "";
