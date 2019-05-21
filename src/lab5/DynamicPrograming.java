@@ -30,56 +30,71 @@ public class DynamicPrograming {
 
 	private static void dynoPro(String a, String b) {
 		int[][] M = generateMArray(a, b);
-		String[] result = findShortestPath(M, a.length(), b.length(), new StringBuilder(), new StringBuilder(), a, b);
+		
+		String[] result = findShortestPath(M, a.length(), b.length(),
+				new StringBuilder(), new StringBuilder(), a, b);
+		
 		System.out.println(result[0] + " " + result[1]);
 	}
 
 	private static String[] findShortestPath(int[][] M, int i, int j, StringBuilder subA, StringBuilder subB, String a,
 			String b) {
-	
+
 		if (i == 0 && j != 0) {
-			String prevCharB = String.valueOf(b.charAt(j - 1));
-			subA.insert(0, "*");
-			subB.insert(0, prevCharB);
-			j--;
-			findShortestPath(M, i, j, subA, subB, a, b);
-			
+			writeNextCharacter(subA, subB, -1, j - 1, a, b);
+			findShortestPath(M, i, j - 1, subA, subB, a, b);
+
 		} else if (j == 0 && i != 0) {
-			String prevCharA = String.valueOf(a.charAt(i - 1));
-			subA.insert(0, prevCharA);
-			subB.insert(0, "*");
-			i--;
-			findShortestPath(M, i, j, subA, subB, a, b);
-			
+			writeNextCharacter(subA, subB, i, -1, a, b);
+			findShortestPath(M, i - 1, j, subA, subB, a, b);
+
 		} else if (i != 0 && j != 0) {
 			int prevDiagCost = M[i - 1][j - 1];
 			int prevDownCost = M[i][j - 1];
 
-			String prevCharA = String.valueOf(a.charAt(i - 1));
-			String prevCharB = String.valueOf(b.charAt(j - 1));
-			
-			int costOfDiag = weightTable[characters.get(prevCharA)][characters.get(prevCharB)];
-			
+			int costOfDiag = weightTable
+					[characters.get(String.valueOf(a.charAt(i - 1)))]
+					[characters.get(String.valueOf(b.charAt(j - 1)))];
+
 			if (M[i][j] == prevDiagCost + costOfDiag) {
-				subA.insert(0, prevCharA);
-				subB.insert(0, prevCharB);
-				i--;
-				j--;
+				writeNextCharacter(subA, subB, i - 1, j - 1, a, b);
+				findShortestPath(M, i - 1, j - 1, subA, subB, a, b);
+				
 			} else if (M[i][j] == prevDownCost + delta) {
-				subA.insert(0, "*");
-				subB.insert(0, prevCharB);
-				j--;
+				writeNextCharacter(subA, subB, -1, j - 1, a, b);
+				findShortestPath(M, i, j - 1, subA, subB, a, b);
+				
 			} else {
-				subA.insert(0, prevCharA);
-				subB.insert(0, "*");
-				i--;
+				writeNextCharacter(subA, subB, i - 1, -1, a, b);
+				findShortestPath(M, i - 1, j, subA, subB, a, b);
 			}
-			
-			findShortestPath(M, i, j, subA, subB, a, b);
 		}
-		
+
 		return new String[] { subA.toString(), subB.toString() };
 
+	}
+
+	private static void writeNextCharacter(StringBuilder subA, StringBuilder subB, 
+			int i, int j, String a, String b) {
+
+		String charA = "";
+		String charB = "";
+		
+		if(i == -1) {
+			charA = "*";
+			charB = String.valueOf(b.charAt(j));
+		}
+		else if(j == -1) {
+			charA = String.valueOf(a.charAt(i));
+			charB = "*";
+		}
+		else {
+			charA = String.valueOf(a.charAt(i));
+			charB = String.valueOf(b.charAt(j));
+		}
+		
+		subA.insert(0, charA);
+		subB.insert(0, charB);
 	}
 
 	private static int[][] generateMArray(String a, String b) {
@@ -182,9 +197,3 @@ public class DynamicPrograming {
 	}
 
 }
-
-/*
- * if(isCached(...)) { return getCache(...); }
- * 
- * int cost = calculate(...); setCache(cost, ...); return cost;
- */
