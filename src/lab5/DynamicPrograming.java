@@ -80,8 +80,6 @@ public class DynamicPrograming {
 		String charA = "";
 		String charB = "";
 		
-		System.out.println(i + " " + j);
-		
 		if(i == -1) {
 			charA = "*";
 			charB = String.valueOf(b.charAt(j));
