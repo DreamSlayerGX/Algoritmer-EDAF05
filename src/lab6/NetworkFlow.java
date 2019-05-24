@@ -16,20 +16,51 @@ public class NetworkFlow {
 			this.nodeB = nodeB;
 			this.weigt = weigt;
 		}
-
+		
 	}
 	
 	private static int N, M, C, P;
-	private static int[] removeNode;
+	private static int[] removeEdge;
 	private static Edge[] edges;
 	
+	private static int leftBound, rightBound;
+	private static int binaryIndex;
+	
 	//Change this to false to stop debug (d_ methods) prints!
-	private static final boolean debug = true;
+	private static final boolean debug = false;
 	
 	public static void main(String[] args) {
 		parseInputData();
+		fordFulkerson();
+	}
+	
+	private static void fordFulkerson() {
 		
+		int i = 0;
+		int flow = 0;
+		while(i++ < 10) {
+			setNextBinaryIndex(flow);
+			flow = DFS();
+			
+		}
 		
+		System.out.println(binaryIndex + " " + flow);
+		
+	}
+	
+	private static void setNextBinaryIndex(int flow) {
+		
+		binaryIndex = (rightBound + leftBound)/2;
+		
+		if(flow < C)
+			rightBound = binaryIndex - 1;
+		else if(flow > C) 
+			leftBound = binaryIndex + 1;
+	}
+	
+	private static int DFS() {
+		
+		return 0;
 	}
 	
 	private static void parseInputData() {
@@ -41,15 +72,18 @@ public class NetworkFlow {
 		C = sizes[2];
 		P = sizes[3];
 		
+		leftBound = 0;
+		rightBound = P-1;
+		
 		edges = new Edge[M];
 		for(int i = 0; i < M; i++) {
 			int[] edgeInfo = Arrays.stream(sc.nextLine().split(" ")).mapToInt(Integer::parseInt).toArray();
 			edges[i] = new Edge(edgeInfo[0], edgeInfo[1], edgeInfo[2]);
 		}
 		
-		removeNode = new int[P];
+		removeEdge = new int[P];
 		for(int i = 0; i < P; i++) {
-			removeNode[i] = Integer.parseInt(sc.nextLine());
+			removeEdge[i] = Integer.parseInt(sc.nextLine());
 		}
 		
 		sc.close();
@@ -66,7 +100,7 @@ public class NetworkFlow {
 			System.out.println(e.nodeA + " " + e.nodeB + " " + e.weigt);
 		}
 		
-		for(int i : removeNode) {
+		for(int i : removeEdge) {
 			System.out.println(i);
 		}
 	}

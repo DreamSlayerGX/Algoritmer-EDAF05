@@ -20,6 +20,7 @@ public class DynamicPrograming {
 	private static final boolean debug = false;
 
 	public static void main(String[] args) {
+		System.out.println("Max memory: " + (Runtime.getRuntime().maxMemory() /1024 / 1024) + " MB" );
 		parseInputData();
 
 		for (Pair<String, String> p : queries) {
@@ -28,6 +29,10 @@ public class DynamicPrograming {
 
 	}
 
+	//Max memory: 1808 MB
+
+
+	
 	private static void dynoPro(String a, String b) {
 		int[][] M = generateMArray(a, b);
 		
