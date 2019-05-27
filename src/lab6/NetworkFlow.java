@@ -2,205 +2,282 @@ package lab6;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 public class NetworkFlow {
-	
-	private static class Edge{
-		
+
+	private static class Edge {
+
 		public final int nodeA, nodeB;
 		public final int weigt;
-		
-		
+
 		public Edge(int nodeA, int nodeB, int weigt) {
 			this.nodeA = nodeA;
 			this.nodeB = nodeB;
 			this.weigt = weigt;
 		}
-		
-		public String toString() {
-			return (nodeA) + " " + (nodeB) + " " + (weigt);
-		}
-		
+
 	}
-	
+
+	// N nodes, E edges, C throughtput of students, P routes in plan
 	private static int N, M, C, P;
-	private static ArrayList<Integer> removeEdge;
+	private static int[] removeNode;
 	private static Edge[] edges;
-	
-	private static Map<Integer, ArrayList<Integer>> graph;
-	
-	private static int leftBound, rightBound;
-	private static int binaryIndex;
-	
-	//Change this to false to stop debug (d_ methods) prints!
-	private static final boolean debug = true;
-	
+
+	// Change this to false to stop debug (d_ methods) prints!
+	private static final boolean debug = false;
+
+	/**
+	 * This is the main method. It parses the input file, then calcualtes the
+	 * optimal number of route drops for the network.
+	 */
 	public static void main(String[] args) {
 		parseInputData();
-		fordFulkerson();
+		binaryDrop(0, P - 1);
 	}
-	
-	private static void fordFulkerson() {
-		
-		int i = -1;
-		int flow = 0;
-		
-		while(i++ != 3) {
-		//while(i != binaryIndex) {
-			//i = binaryIndex;
-			setNextBinaryIndex(flow);
-			flow = DFS();
-			
-		}
-		
-		System.out.println(binaryIndex + " " + flow);
-		
-	}
-	
-	private static int DFS() {
-		Edge[] edgeSubSet = generateSubSet();
-		boolean[] visited = new boolean[edgeSubSet.length];
 
-		if(edgeSubSet == null)
-			return 0;
-		
-		
-		return 0;
-	}
-	
-	/*
-	 * To generate the subset of edges to go through.
-	 * This will take O(N) since we go through the list every time. Save list and modify it?
+	/**
+	 * A binary search algorithm that will use the Ford Fulkersson algorithm to
+	 * calculate maximum number of routs that can be dropped while still allowing
+	 * for the minumum required throughput of students from Minsk (source node) to
+	 * Lund (sink node). The Binary search is conducted by calculating the
+	 * throughput when half of the possible routes have been dropped and (depending
+	 * of the the throughput requirements) will either add back half of the removed
+	 * routes or drop half of the remaining possible routes. Eventually the
+	 * binaryDrop method will home in on the optimal number of routes to drop that
+	 * still maintains the required throughput.
 	 */
-	private static Edge[] generateSubSet() {
-		Edge[] subSet = new Edge[(edges.length - 1) - binaryIndex];
-		List<Integer> subRemove = removeEdge.subList(0, binaryIndex + 1);
-		int j = 0;
+	private static void binaryDrop(int low, int high) {
+		int range = high - low;
 		
-		for(int i = 0; i < edges.length; i++) {
-			if(!subRemove.contains(i))
-				subSet[j++] = edges[i]; 
+		if (range > 3) {
+			int mid = range / 2 + low;
+			int flux = fordFulkerson(makeGraphFromEdges(mid));
+			if (flux >= C) {
+				binaryDrop(mid, high);
+			} else if (flux <= C) {
+				binaryDrop(low, mid);
+			}
+		} else {
+			int drops = -1;
+			for (int i = low; i <= high; i++) {
+				int flux = fordFulkerson(makeGraphFromEdges(i));
+				if (flux < C && drops < 0) {
+					drops = i - 1;
+				}
+			}
+			if (drops < 0) {
+				drops = high;
+			}
+			System.out.println(drops + " " + fordFulkerson(makeGraphFromEdges(drops)));
 		}
-		
-		d_printSubSet(subSet);
-		
-		return createNewGraph(subSet) ? subSet : null;
+
 	}
-	
-	/*
-	* Generate the graph corresponding to the subset of edges.
-	* Costly to do this every time. Returns false if node Minsk (0) or Lund (N-1) doesn't exist.
-	* O(N^2)
-	*/
-	private static boolean createNewGraph(Edge[] edgeSubSet) {
-		graph = new HashMap<>();
+
+	/**
+	 * This is an implementation of the Ford Fulkerson algorithm for calculating the
+	 * total flux through a network. The method takes a graph with edge weights and
+	 * calculates the maximum possible throughput of that graph (assuming source
+	 * node at index 0 and sink node at index N-1).
+	 */
+	private static int fordFulkerson(int[][] g) {
+		int[][] rGraph;
+		int max_flow = 0;
+		int m = N - 1;
 		
-		for(int i = 0; i < edgeSubSet.length; i++) {
-			int keyNode = edgeSubSet[i].nodeA;
-			
-			if(!graph.containsKey(keyNode))
-				graph.put(keyNode, new ArrayList<>());
-			
-			graph.get(keyNode).add(edgeSubSet[i].nodeB);
-			
-			for(int j = i + 1; j < edgeSubSet.length; j++) {
-				Edge e = edgeSubSet[j];
-				
-				if(e.nodeA == keyNode)
-					graph.get(keyNode).add(e.nodeB);
-				else if(e.nodeB == keyNode)
-					graph.get(keyNode).add(e.nodeA);
-				
+		rGraph = new int[N][N];
+		
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < N; j++) {
+				rGraph[i][j] = g[i][j];
 			}
 		}
 		
-		d_printGraph();
+		ArrayList<Integer> foundPath = DFS(rGraph);
+		d_printGraph(rGraph);
 		
-		return (graph.containsKey(0) || graph.containsKey(N - 1));
-		
+		while (foundPath != null) {
+			int flux = foundPath.get(0);
+			foundPath.remove(0);
+			Collections.reverse(foundPath);
+			int[] path = foundPath.stream().mapToInt(Integer::intValue).toArray();
+			for (int n = 0; n < path.length - 1; n++) {
+				rGraph[path[n]][path[n + 1]] = rGraph[path[n]][path[n + 1]] - flux;
+				rGraph[path[n + 1]][path[n]] = rGraph[path[n + 1]][path[n]] - flux;
+			}
+			max_flow = max_flow + flux;
+			foundPath = DFS(rGraph);
+		}
+		return max_flow;
 	}
-	
-	/*
-	 * To set the index of which we remove edges (binary search)
+
+	/**
+	 * The top level depth first search method. Given a graph, it will return an
+	 * ArrayList<Integer> where the first element is the smallest wedge weight, and
+	 * every subsiquent element is the path taken from the source node (0) and the
+	 * sink node (N-1)
 	 */
-	private static void setNextBinaryIndex(int flow) {
-		
-		binaryIndex = (rightBound + leftBound)/2;
-		
-		if(flow < C)
-			rightBound = binaryIndex - 1;
-		else if(flow > C) 
-			leftBound = binaryIndex + 1;
+	private static ArrayList<Integer> DFS(int[][] g) {
+		boolean[] visited = new boolean[g.length];
+		ArrayList<Integer> path = recDFS(g, visited, 0);
+		return path;
 	}
-	
+
+	/**
+	 * This is the recursion for the depth first search. The method requires that
+	 * you pass the graph with edge weights as well as a vector that denotes which
+	 * nodes have been visited, as well as the node index for the node you want to
+	 * start the DFS on. The DFS always terminates when it reaches the sink node
+	 * (N-1)
+	 */
+	private static ArrayList<Integer> recDFS(int[][] g, boolean[] visited, int current) {
+		visited[current] = true;
+		ArrayList<Integer> path = null;
+		if (current == g.length - 1) {
+			path = new ArrayList<Integer>();
+			path.add(Integer.MAX_VALUE);
+			path.add(current);
+			return path;
+		} else {
+			for (int i = g.length - 1; i >= 0; i--) {
+				if (g[current][i] != 0 && visited[i] == false) {
+					path = recDFS(g, visited, i);
+				}
+				if (path != null) {
+					path.add(current);
+					if (path.get(0) > g[current][i]) {
+						path.set(0, g[current][i]);
+					}
+					return path;
+				}
+			}
+			return null;
+		}
+	}
+
+	/**
+	 * Tell this method how many routes to drop, it will build a graph with those
+	 * routes dropped.
+	 */
+	private static int[][] makeGraphFromEdges(int drops) {
+		Set<Integer> drop_Set = new HashSet<Integer>();
+		for (int j = 0; j < drops; j++) {
+			drop_Set.add(removeNode[j]);
+		}
+		int[][] g = new int[N][N];
+		if (debug) {
+			System.out.println("drops: " + drops);
+			System.out.println("drop_Set: " + drop_Set);
+		}
+		for (int i = 0; i < M; i++) {
+			Edge e = edges[i];
+			if (drop_Set.contains(i)) {
+				if (debug) {
+					System.out.println("dropped i: " + i + " & dropped edges[i]: [" + e.nodeA + " " + e.nodeB + " "
+							+ e.weigt + "]");
+				}
+			} else {
+				g[e.nodeA][e.nodeB] = e.weigt;
+				g[e.nodeB][e.nodeA] = e.weigt;
+				if (debug) {
+					System.out.println("i: " + i + " edges[i]: [" + e.nodeA + " " + e.nodeB + " " + e.weigt + "]");
+				}
+			}
+		}
+		return g;
+	}
+
+	// -----------------------------
+	// Parse ALL the Input
+	// -----------------------------
+
 	private static void parseInputData() {
 		Scanner sc = new Scanner(System.in);
-		
+
 		int[] sizes = Arrays.stream(sc.nextLine().split(" ")).mapToInt(Integer::parseInt).toArray();
-		N = sizes[0];
-		M = sizes[1];
-		C = sizes[2];
-		P = sizes[3];
-		
-		leftBound = 0;
-		rightBound = P-1;
-		
+		N = sizes[0]; // Nodes
+		M = sizes[1]; // Edges
+		C = sizes[2]; // Min Flux
+		P = sizes[3]; // Routes
+
 		edges = new Edge[M];
-		for(int i = 0; i < M; i++) {
+		for (int i = 0; i < M; i++) {
 			int[] edgeInfo = Arrays.stream(sc.nextLine().split(" ")).mapToInt(Integer::parseInt).toArray();
 			edges[i] = new Edge(edgeInfo[0], edgeInfo[1], edgeInfo[2]);
 		}
-		
-		removeEdge = new ArrayList<>(P);
-		for(int i = 0; i < P; i++) {
-			removeEdge.add(Integer.parseInt(sc.nextLine()));
+
+		removeNode = new int[P];
+		for (int i = 0; i < P; i++) {
+			removeNode[i] = Integer.parseInt(sc.nextLine());
 		}
-		
+
 		sc.close();
 		d_printInputData();
 	}
-	
-	private static void d_printGraph() {
-		if(!debug)
+
+	// -----------------------------
+	// Print ALL the things
+	// -----------------------------
+
+	/** Help method for debugging. */
+	private static void d_printPath(ArrayList<Integer> path) {
+		if (!debug)
 			return;
-		
-		System.out.print("\n\nGraph");
-		for(Entry<Integer, ArrayList<Integer>> set : graph.entrySet()) {
-			System.out.print("\n" + set.getKey() + " | ");
-			for(Integer toNode : set.getValue())
-				System.out.print(" " + toNode);
-			
+
+		if (path != null) {
+			System.out.println(" ");
+			for (Integer i : path) {
+				System.out.print(i + "<-");
+			}
+			System.out.print("Path");
+		} else {
+			System.out.print("Path not found");
 		}
 	}
-	
-	private static void d_printSubSet(Edge[] subSet) {
-		System.out.println("\n\nSubSet");
-		System.out.println("BinaryIndex = " + binaryIndex);
-		for(Edge e : subSet) {
-			if(e == null) {
-				System.out.println("NULL");
-			} else {
-				System.out.println(e.toString());
+
+	/** Help method for debugging. */
+	private static void d_printGraph(int[][] g) {
+		if (!debug)
+			return;
+
+		for (int i = 0; i < g.length; i++) {
+			System.out.println(" ");
+			for (int j = 0; j < g.length; j++) {
+				System.out.print(" " + g[i][j]);
 			}
 		}
+		System.out.println(" ");
 	}
-	
+
+	/** Help method for debugging. */
 	private static void d_printInputData() {
-		if(!debug)
+		if (!debug)
 			return;
-		
+
 		System.out.println(N + " " + M + " " + C + " " + P);
-		
-		for(Edge e : edges) {
-			System.out.println(e.toString());
+
+		for (Edge e : edges) {
+			System.out.println(e.nodeA + " " + e.nodeB + " " + e.weigt);
 		}
-		
-		for(int i : removeEdge) {
+
+		for (int i : removeNode) {
+			System.out.println(i);
+		}
+	}
+
+	/** Help method for debugging. */
+	private static void printInputData() {
+
+		System.out.println(N + " " + M + " " + C + " " + P);
+
+		for (Edge e : edges) {
+			System.out.println(e.nodeA + " " + e.nodeB + " " + e.weigt);
+		}
+
+		for (int i : removeNode) {
 			System.out.println(i);
 		}
 	}
